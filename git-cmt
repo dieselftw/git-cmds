@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# - Generate SSH keys using `ssh-keygen -t ed25519 -C "your_email@abcd.com"`
+# - Get the SSH keys to ~/.ssh directory (or wherever you store them)
+# - Select the .pub file to add to your GitHub/GitLab account
+# - Go to GitHub or GitLab and click on authentication key
+# - Add this key there, follow the instructions present there
+# - Add the path to the SSH key in the git-cmt script
+# - That's it :)
+
+# Prompt for profile
+read -p "Enter profile (1-Work, 2-Personal): " pass
+echo ""
+
+# Add profiles here (1: work, 2: personal, 3: ...)
+case "$pass" in
+    "1")
+        git config user.name "--WORK--"
+        git config user.email "--workemail--"
+        git config user.signingkey "$HOME/.ssh/id_ed25519.pub"
+        git config gpg.format ssh
+        git config commit.gpgsign true
+        echo "🔑 Using WORK identity"
+        ;;
+    "2")
+        git config user.name "--YourName--"
+        git config user.email "--personalemail--"
+        git config user.signingkey "$HOME/.ssh/personal_github.pub"
+        git config gpg.format ssh
+        git config commit.gpgsign true
+        echo "🔑 Using PERSONAL identity"
+        ;;
+    *)
+        echo "❌ Invalid ID - commit aborted"
+        exit 1
+        ;;
+esac
+
+# Pass all arguments to git commit, enabling SSH signing
+git commit -S "$@"
